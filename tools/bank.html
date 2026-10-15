@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8" /><title>Bank builder</title></head>
+<body>
+  <p>Bank builder. Driven by <code>scripts/build-bank.mjs</code>.</p>
+  <script type="module">
+    import { Engine } from "../js/engine.js";
+    import { configureEngine } from "../js/trainer.js";
+    Engine.load().then(configureEngine).then(() => (window.engineReady = true));
+  </script>
+</body>
+</html>

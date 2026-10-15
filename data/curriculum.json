@@ -1,0 +1,74 @@
+{
+  "chapters": [
+    {
+      "id": "opening",
+      "title": "Opening moves",
+      "icon": "ph-flag-banner",
+      "kind": "checker",
+      "concept": "The first roll of the game sets the tone. Some rolls make a valuable point right away: 3-1 makes your 5-point, 6-1 your bar point, 4-2 your 4-point. With the others you choose between splitting your back checkers and bringing builders down from the midpoint."
+    },
+    {
+      "id": "replies",
+      "title": "Early game",
+      "icon": "ph-arrows-split",
+      "kind": "checker",
+      "concept": "After the first few moves, the book runs out and the board starts to matter. When GNU leaves a blot, hitting it is often right. When its checkers are safe, building your own position may matter more. Read the board before reaching for a standard move."
+    },
+    {
+      "id": "points",
+      "title": "Making points",
+      "icon": "ph-squares-four",
+      "kind": "checker",
+      "concept": "Points in front of the opponent's back checkers are the backbone of a strong position. Your 5-point, 4-point and bar point block GNU's escape routes and give you a home board to attack with. Look for rolls that make a new point, and keep builders nearby for next time."
+    },
+    {
+      "id": "hitting",
+      "title": "Hitting and attacking",
+      "icon": "ph-lightning",
+      "kind": "checker",
+      "concept": "Hitting sends a checker back and costs your opponent pips and a tempo. It is strongest when your home board is solid, so a checker on the bar may struggle to come in. Hitting twice, or hitting while making a point, can win the game outright. Sometimes a quieter move is still better."
+    },
+    {
+      "id": "safety",
+      "title": "Safety or boldness",
+      "icon": "ph-shield-check",
+      "kind": "checker",
+      "concept": "Every blot you leave can be hit, and the number of rolls that hit it matters. Bold plays accept some risk to build a better position. Safe plays keep the shots down when getting hit would be costly. Weigh what you gain against what you lose if hit."
+    },
+    {
+      "id": "primes",
+      "title": "Primes and anchors",
+      "icon": "ph-wall",
+      "kind": "checker",
+      "concept": "A prime is a wall of consecutive points. Six in a row traps a checker completely, and even four or five make escaping hard. An anchor is a point you hold in the opponent's home board: a safe landing spot that keeps you in the game when you are behind."
+    },
+    {
+      "id": "racing",
+      "title": "Racing and bearing in",
+      "icon": "ph-flag-checkered",
+      "kind": "checker",
+      "concept": "Once the checkers have passed each other, the game is a pure race. Bring your checkers home without wasting pips, and think ahead: where they land in your home board decides how smoothly you bear off."
+    },
+    {
+      "id": "bearoff",
+      "title": "Bear-off",
+      "icon": "ph-sign-out",
+      "kind": "checker",
+      "concept": "With every checker home, the goal is to bear off as fast as possible. Take a checker off whenever you can, avoid gaps on your low points, and spread checkers so future rolls are not wasted."
+    },
+    {
+      "id": "cube",
+      "title": "Doubling",
+      "icon": "ph-cube",
+      "kind": "double",
+      "concept": "The doubling cube is where many points are won and lost. Double when you are strong enough that a take or a pass both help you, but not so strong that playing on for a gammon is worth more. Double too early and you hand over the cube; too late and you lose your market."
+    },
+    {
+      "id": "take",
+      "title": "Take or pass",
+      "icon": "ph-hand-palm",
+      "kind": "take",
+      "concept": "When doubled, compare playing on for twice the stake with giving up one point now. In a simple race you need about 25% winning chances to take, and owning the cube helps a little. Gammons against you raise the bar, so count them too."
+    }
+  ]
+}

@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>gammon. Backgammon trainer</title>
+  <meta name="description" content="Play GNU Backgammon, train checker play and cube decisions, and learn why moves are right or wrong." />
+  <meta name="theme-color" content="#0f1311" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#e3e7e1" media="(prefers-color-scheme: light)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="gammon" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="preload" href="vendor/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="vendor/fonts/fonts.css" />
+  <link rel="stylesheet" href="vendor/phosphor/regular.css" />
+  <link rel="stylesheet" href="vendor/phosphor/fill.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="bar">
+      <div class="bar__lead">
+        <a class="icon-btn" id="back-btn" href="#/" aria-label="Home" hidden><i class="ph ph-caret-left"></i></a>
+        <a class="wordmark" id="wordmark" href="#/" aria-label="gammon, home">gammon<span>.</span></a>
+        <h1 class="bar__title" id="bar-title" hidden></h1>
+      </div>
+      <div class="bar__center">
+        <div class="status-pill" id="status-pill" hidden></div>
+        <nav class="segmented segmented--bar" id="train-tabs" hidden aria-label="Training mode">
+          <a class="seg" data-kind="checker" href="#/train/checker">Moves</a>
+          <a class="seg" data-kind="cube" href="#/train/cube">Cube</a>
+          <a class="seg" data-kind="review" href="#/train/review">Review<span class="count" id="review-count"></span></a>
+        </nav>
+      </div>
+      <div class="bar__actions">
+        <nav class="desk-nav" aria-label="Sections">
+          <a data-nav="play" href="#/play">Play</a>
+          <a data-nav="daily" href="#/daily">Daily</a>
+          <a data-nav="learn" href="#/learn">Learn</a>
+          <a data-nav="train" href="#/train">Train</a>
+        </nav>
+        <button class="icon-btn" id="options-btn" type="button" aria-label="Game options" hidden><i class="ph ph-sliders-horizontal"></i></button>
+        <button class="icon-btn" id="menu-btn" type="button" aria-label="Menu"><i class="ph ph-list"></i></button>
+      </div>
+    </header>
+
+    <main class="view view--game" id="view-game">
+      <div class="table">
+        <div class="seat seat--opp" id="seat-opp">
+          <span class="seat__chip seat__chip--opp" aria-hidden="true"></span>
+          <span class="seat__name" id="name-opp">GNU</span>
+          <span class="seat__stat"><b id="pip-opp">167</b> pips</span>
+          <span class="seat__stat seat__off"><b id="off-opp">0</b> off</span>
+        </div>
+
+        <div class="board-area" id="board-area">
+          <div class="board-shell" id="board-shell">
+            <svg id="board" role="img" aria-label="Backgammon board"></svg>
+            <div class="board-loading" id="board-loading">
+              <span class="loading-title">Waking up the engine</span>
+              <span class="loading-sub">GNU Backgammon runs entirely on your device.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="seat seat--me" id="seat-me">
+          <span class="seat__chip seat__chip--me" aria-hidden="true"></span>
+          <span class="seat__name" id="name-me">You</span>
+          <span class="seat__stat"><b id="pip-me">167</b> pips</span>
+          <span class="seat__stat seat__off"><b id="off-me">0</b> off</span>
+        </div>
+      </div>
+
+      <section class="dock" id="dock">
+        <div class="prompt">
+          <div class="scoreline" id="scoreline" hidden></div>
+          <h2 class="prompt__title" id="task-title">Setting up the board</h2>
+          <p class="prompt__sub" id="task-sub"></p>
+          <p class="prompt__status" id="task-status" aria-live="polite"></p>
+          <button class="verdict-chip" id="verdict-chip" type="button" hidden></button>
+        </div>
+
+        <div class="actions" id="actions-checker" hidden>
+          <button class="btn btn--ghost btn--icon" id="btn-undo" type="button" disabled aria-label="Undo last checker">
+            <i class="ph ph-arrow-u-up-left"></i><span>Undo</span>
+          </button>
+          <button class="btn btn--primary" id="btn-submit" type="button" disabled>
+            <span id="btn-submit-label">Submit move</span><kbd>Enter</kbd>
+          </button>
+        </div>
+        <div class="actions actions--wrap" id="actions-choice" hidden></div>
+        <div class="actions" id="actions-roll" hidden>
+          <button class="btn btn--ghost" id="btn-double" type="button">Double</button>
+          <button class="btn btn--primary" id="btn-roll" type="button">
+            <span>Roll dice</span><span class="btn__orb"><i class="ph-fill ph-dice-five"></i></span>
+          </button>
+        </div>
+        <div class="actions" id="actions-next" hidden>
+          <button class="btn btn--primary btn--wide" id="btn-next" type="button">
+            <span id="btn-next-label">Next position</span><span class="btn__orb"><i class="ph ph-arrow-right"></i></span>
+          </button>
+        </div>
+        <button class="link-btn dock__resign" id="btn-resign" type="button" hidden><i class="ph ph-flag"></i><span>Resign</span></button>
+      </section>
+
+      <!-- Analysis: a bottom sheet on phones, a side panel on wide screens. -->
+      <section class="analysis" id="analysis" aria-label="Analysis">
+        <div class="analysis__grab" id="analysis-grab" aria-hidden="true"></div>
+        <button class="icon-btn analysis__close" id="analysis-close" type="button" aria-label="Close analysis"><i class="ph ph-x"></i></button>
+        <div class="result" id="result" hidden aria-live="polite"></div>
+        <p class="analysis__empty" id="analysis-empty">Analysis of your decisions shows up here.</p>
+      </section>
+    </main>
+
+    <main class="view view--page" id="page" hidden></main>
+  </div>
+
+  <div class="scrim" id="scrim" hidden></div>
+
+  <!-- Menu -->
+  <dialog class="sheet" id="menu" aria-labelledby="menu-title">
+    <div class="sheet__grab" aria-hidden="true"></div>
+    <div class="sheet__head">
+      <h2 id="menu-title">Menu</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close"><i class="ph ph-x"></i></button>
+    </div>
+    <nav class="menu-nav" aria-label="Sections">
+      <a href="#/" data-nav="home"><i class="ph ph-house"></i><span>Home</span><i class="ph ph-caret-right"></i></a>
+      <a href="#/play" data-nav="play"><i class="ph ph-play"></i><span>Play GNU</span><i class="ph ph-caret-right"></i></a>
+      <a href="#/daily" data-nav="daily"><i class="ph ph-fire"></i><span>Daily challenge</span><i class="ph ph-caret-right"></i></a>
+      <a href="#/learn" data-nav="learn"><i class="ph ph-graduation-cap"></i><span>Learn</span><i class="ph ph-caret-right"></i></a>
+      <a href="#/train" data-nav="train"><i class="ph ph-target"></i><span>Train</span><i class="ph ph-caret-right"></i></a>
+      <a href="#/profile" data-nav="profile"><i class="ph ph-user-circle"></i><span>Profile</span><i class="ph ph-caret-right"></i></a>
+    </nav>
+
+    <div class="stats-row" aria-label="Statistics for this mode">
+      <div><b id="stat-a">0</b><span id="stat-a-label">Decisions</span></div>
+      <div><b id="stat-loss">-</b><span>Avg. loss</span></div>
+      <div><b id="stat-c">-</b><span id="stat-c-label">Accuracy</span></div>
+      <div><b id="stat-level">-</b><span>Level</span></div>
+    </div>
+    <ol class="recent" id="recent" aria-label="Recent decisions"></ol>
+
+    <div class="settings">
+      <div class="switch">
+        <span id="theme-label">Theme</span>
+        <div class="segmented segmented--small" role="radiogroup" aria-labelledby="theme-label" id="theme">
+          <button class="seg" role="radio" data-theme-value="auto">Auto</button>
+          <button class="seg" role="radio" data-theme-value="dark">Dark</button>
+          <button class="seg" role="radio" data-theme-value="light">Light</button>
+        </div>
+      </div>
+      <label class="switch"><span>Haptics</span><input type="checkbox" id="set-haptics" /><i></i></label>
+    </div>
+
+    <div class="sheet__foot">
+      <button class="link-btn" type="button" id="btn-reset-stats">Reset these stats</button>
+      <button class="link-btn" type="button" id="credits-btn">Credits and licences</button>
+    </div>
+  </dialog>
+
+  <!-- Game options -->
+  <dialog class="sheet" id="options" aria-labelledby="options-title">
+    <div class="sheet__grab" aria-hidden="true"></div>
+    <div class="sheet__head">
+      <h2 id="options-title">Options</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close"><i class="ph ph-x"></i></button>
+    </div>
+
+    <div class="opt-group" id="settings-play" hidden>
+      <div class="field">
+        <span class="field__label" id="match-label">Game type</span>
+        <div class="chips" role="radiogroup" aria-labelledby="match-label">
+          <button class="chip" role="radio" data-match="0">Money</button>
+          <button class="chip" role="radio" data-match="3">3 pts</button>
+          <button class="chip" role="radio" data-match="5">5 pts</button>
+          <button class="chip" role="radio" data-match="7">7 pts</button>
+          <button class="chip" role="radio" data-match="11">11 pts</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field__label" id="level-label">Opponent</span>
+        <div class="chips" role="radiogroup" aria-labelledby="level-label">
+          <button class="chip" role="radio" data-level="beginner">Beginner</button>
+          <button class="chip" role="radio" data-level="casual">Casual</button>
+          <button class="chip" role="radio" data-level="intermediate">Intermediate</button>
+          <button class="chip" role="radio" data-level="advanced">Advanced</button>
+          <button class="chip" role="radio" data-level="expert">Expert</button>
+          <button class="chip" role="radio" data-level="worldclass">World class</button>
+        </div>
+      </div>
+      <div class="settings">
+        <label class="switch"><span>Doubling cube<small>From the next game</small></span><input type="checkbox" id="play-cube" /><i></i></label>
+        <label class="switch"><span>Coach<small>Grade each decision as you play</small></span><input type="checkbox" id="play-feedback" /><i></i></label>
+      </div>
+      <button class="btn btn--primary btn--wide" type="button" id="new-game-btn"><span>New game</span><span class="btn__orb"><i class="ph ph-arrow-clockwise"></i></span></button>
+    </div>
+
+    <div class="opt-group" id="settings-checker" hidden>
+      <div class="field">
+        <span class="field__label" id="phase-label">Game phase</span>
+        <div class="chips" role="radiogroup" aria-labelledby="phase-label">
+          <button class="chip" role="radio" data-phase="any">Any</button>
+          <button class="chip" role="radio" data-phase="opening">Opening</button>
+          <button class="chip" role="radio" data-phase="middle">Middle game</button>
+          <button class="chip" role="radio" data-phase="bearoff">Bear-off</button>
+        </div>
+      </div>
+      <div class="settings">
+        <label class="switch"><span>Close calls only<small>Top two plays within 0.05</small></span><input type="checkbox" id="close-only" /><i></i></label>
+      </div>
+    </div>
+
+    <p class="sheet__note">Position ID <span class="mono" id="position-id">-</span></p>
+  </dialog>
+
+  <!-- Credits -->
+  <dialog class="sheet" id="credits" aria-labelledby="credits-title">
+    <div class="sheet__grab" aria-hidden="true"></div>
+    <div class="sheet__head">
+      <h2 id="credits-title">Credits</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="credits">
+      <p><strong>GNU Backgammon</strong> plays and analyses every position. It is free software released under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GNU General Public License v3</a>.
+        Source code: <a href="https://www.gnu.org/software/gnubg/" target="_blank" rel="noopener">gnu.org/software/gnubg</a>.
+        WebAssembly build: <a href="https://github.com/hwatheod/gnubg-web" target="_blank" rel="noopener">gnubg-web</a>.</p>
+      <p><strong>Fonts:</strong> Bricolage Grotesque and JetBrains Mono, SIL Open Font License.
+        <strong>Icons:</strong> Phosphor, MIT License.</p>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
